@@ -46,6 +46,7 @@ button.a{background:var(--ac);color:#fff;border-color:var(--ac)}
 .ex{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
 .ex button{flex:0 0 auto;padding:12px 16px;font-size:16px;font-weight:600;background:var(--card)}
 .ex button.a{background:var(--ac)}
+button:disabled{opacity:.3}
 .sm{flex:0 0 auto;font-size:12px;padding:6px 10px;color:var(--mut)}
 </style>
 </head>
@@ -64,7 +65,7 @@ button.a{background:var(--ac);color:#fff;border-color:var(--ac)}
 <div class="card">
   <div class="row" style="justify-content:space-between;align-items:center">
     <h2 id="nm"></h2>
-    <div style="display:flex;gap:6px"><button class="sm" id="ren">이름 변경</button><button class="sm" id="del">종목 삭제</button></div>
+    <div style="display:flex;gap:6px"><button class="sm" id="mvl" aria-label="왼쪽으로 이동">◀</button><button class="sm" id="mvr" aria-label="오른쪽으로 이동">▶</button><button class="sm" id="ren">이름 변경</button><button class="sm" id="del">종목 삭제</button></div>
   </div>
   <div id="rnbox" style="display:none;margin-bottom:10px">
     <label>종목 이름</label>
@@ -126,6 +127,7 @@ function load(){
   $("hm").textContent=u.toUpperCase();$("ho").textContent=(u==="lb"?"KG":"LB");
   $("uk").className=u==="kg"?"a":"";$("ul").className=u==="lb"?"a":"";
   $("rnbox").style.display="none";$("del").textContent="종목 삭제";$("del").style.display=S.ex.length>1?"":"none";
+  $("mvl").disabled=S.active===0;$("mvr").disabled=S.active===S.ex.length-1;
   setMode(e.mode||1,true);renderTabs();calc();
 }
 function calc(){
@@ -170,6 +172,8 @@ $("del").onclick=()=>{
 function doRen(){const n=$("rn").value.trim();if(!n)return;E().n=n;$("rnbox").style.display="none";load();save()}
 $("ren").onclick=()=>{const b=$("rnbox");const show=b.style.display==="none";b.style.display=show?"block":"none";if(show){$("rn").value=E().n;$("rn").focus();$("rn").select()}};
 $("rsave").onclick=doRen;$("rn").onkeydown=e=>{if(e.key==="Enter")doRen()};
+function mv(d){const i=S.active,j=i+d;if(j<0||j>=S.ex.length)return;[S.ex[i],S.ex[j]]=[S.ex[j],S.ex[i]];S.active=j;delArm=false;load();save()}
+$("mvl").onclick=()=>mv(-1);$("mvr").onclick=()=>mv(1);
 load();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>

@@ -9,9 +9,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="1RM표">
+<meta name="apple-mobile-web-app-title" content="My MAX">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>종목별 1RM 퍼센트표</title>
+<title>My MAX</title>
 <style>
 :root{--bg:#f6f6f4;--card:#fff;--fg:#1a1a1a;--mut:#6b6b6b;--ac:#d9480f;--bd:#e2e2de;--hl:#fff1e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--card:#1e1e1e;--fg:#f0f0f0;--mut:#9a9a9a;--ac:#ff8a4c;--bd:#333;--hl:#3a2416}}
@@ -44,7 +44,7 @@ button{flex:1;padding:9px;border:1px solid var(--bd);border-radius:10px;backgrou
 button.a{background:var(--ac);color:#fff;border-color:var(--ac)}
 .u button{font-size:18px;font-weight:700;padding:12px}
 .ex{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
-.ex button{flex:0 0 auto;padding:12px 16px;font-size:16px;font-weight:600;background:var(--card)}
+.ex button{flex:0 0 auto;padding:6px 10px;font-size:13px;font-weight:600;background:var(--card);border-radius:8px}
 .ex button.a{background:var(--ac)}
 button:disabled{opacity:.3}
 .sm{flex:0 0 auto;font-size:12px;padding:6px 10px;color:var(--mut)}
@@ -52,9 +52,9 @@ button:disabled{opacity:.3}
 </head>
 <body>
 <main>
-<h1>🏋️ 종목별 1RM 퍼센트표</h1>
+<h1>🏋️ My MAX</h1>
 
-<div class="tabs u"><button id="uk">KG</button><button id="ul" class="a">LB</button></div>
+<div class="tabs u"><button id="uk">KG</button><button id="ul" class="a">LB</button><button id="ur">MAX REPS</button></div>
 
 <div class="ex" id="ex"></div>
 <div class="card" id="addbox" style="display:none">
@@ -62,7 +62,9 @@ button:disabled{opacity:.3}
   <div class="row"><div class="f"><input id="nn" type="text" placeholder="예: 백스쿼트" maxlength="20"></div><button id="nadd" style="flex:0 0 70px">추가</button></div>
 </div>
 
-<div class="card">
+<div class="card" id="empty" style="display:none;text-align:center;color:var(--mut);padding:28px 14px">이 구간에는 아직 종목이 없어요.<br>위의 ＋를 눌러 추가해 주세요.</div>
+
+<div class="card" id="c1">
   <div class="row" style="justify-content:space-between;align-items:center">
     <h2 id="nm"></h2>
     <div style="display:flex;gap:6px"><button class="sm" id="mvl" aria-label="왼쪽으로 이동">◀</button><button class="sm" id="mvr" aria-label="오른쪽으로 이동">▶</button><button class="sm" id="ren">이름 변경</button><button class="sm" id="del">종목 삭제</button></div>
@@ -71,21 +73,21 @@ button:disabled{opacity:.3}
     <label>종목 이름</label>
     <div class="row"><div class="f"><input id="rn" type="text" maxlength="20"></div><button id="rsave" style="flex:0 0 70px">저장</button></div>
   </div>
-  <div class="tabs">
+  <div class="tabs" id="mtabs">
     <button id="t1" class="a">1RM 직접 입력</button>
     <button id="t2">무게×횟수로 추정</button>
   </div>
   <div class="row" id="m1">
-    <div class="f"><label>1RM (<span class="un">lb</span>)</label><input id="rm" type="number" inputmode="decimal" placeholder="예: 225"></div>
+    <div class="f"><label id="rml">1RM (lb)</label><input id="rm" type="number" inputmode="decimal" placeholder="예: 225"></div>
   </div>
   <div class="row" id="m2" style="display:none">
     <div class="f"><label>든 무게 (<span class="un">lb</span>)</label><input id="w" type="number" inputmode="decimal"></div>
     <div class="f"><label>반복 횟수</label><input id="r" type="number" inputmode="numeric"></div>
   </div>
-  <div style="margin-top:12px;font-size:13px;color:var(--mut)">1RM: <span class="big" id="out">-</span></div>
+  <div style="margin-top:12px;font-size:13px;color:var(--mut)"><span id="ol">1RM</span>: <span class="big" id="out">-</span></div>
 </div>
 
-<div class="card">
+<div class="card" id="c2">
   <label>내가 원하는 퍼센트</label>
   <div class="row" style="align-items:center">
     <div class="f" style="max-width:130px"><input id="cp" type="number" inputmode="decimal" step="any" placeholder="72.5"></div>
@@ -94,9 +96,9 @@ button:disabled{opacity:.3}
   </div>
 </div>
 
-<div class="card">
+<div class="card" id="c3">
   <table>
-    <thead><tr><th>%</th><th class="m" id="hm">LB</th><th id="ho">KG</th><th>목표 횟수</th></tr></thead>
+    <thead><tr id="th"></tr></thead>
     <tbody id="tb"></tbody>
   </table>
   <div class="note">종목마다 1RM이 따로 저장돼요(이 기기·브라우저에 저장). 큰 숫자가 훈련 단위, 회색 숫자는 반대 단위 환산값이에요. 행을 탭하면 강조돼요. 횟수는 일반적인 근사치이고, 1RM 추정은 Epley 공식이에요.</div>
@@ -105,34 +107,68 @@ button:disabled{opacity:.3}
 <script>
 const P=[[100,"1"],[95,"2"],[90,"3~4"],[85,"5~6"],[80,"7~8"],[75,"9~10"],[70,"11~12"],[65,"14~15"],[60,"18~20"],[55,"~25"],[50,"30+"]];
 const $=id=>document.getElementById(id);
-const mk=n=>({n,rm:"",w:"",r:"",cp:"",mode:1});
-let S={unit:"lb",active:0,ex:[mk("스내치"),mk("클린앤저크")]};
+const mk=(n,t)=>({n,t:t||"w",rm:"",w:"",r:"",cp:"",mode:1});
+const T=e=>e.t==="r"?"r":"w";
+let S={unit:"lb",view:"lb",active:0,lw:0,lr:-1,seedR:1,ex:[mk("스내치"),mk("클린앤저크"),mk("풀업","r"),mk("푸쉬업","r")]};
 let sel=null,delArm=false;
-try{const d=JSON.parse(localStorage.getItem("rm3")||"null");if(d&&Array.isArray(d.ex)&&d.ex.length){S=d;if(!(S.active>=0&&S.active<S.ex.length))S.active=0}}catch(e){}
+try{const d=JSON.parse(localStorage.getItem("rm3")||"null");if(d&&Array.isArray(d.ex)){S=d}}catch(e){}
+if(S.unit!=="kg"&&S.unit!=="lb")S.unit="lb";
+if(!["kg","lb","rep"].includes(S.view))S.view=S.unit;
+if(!S.seedR){S.seedR=1;if(!S.ex.some(x=>T(x)==="r"))S.ex.push(mk("풀업","r"),mk("푸쉬업","r"))}
+if(!(S.lw>=0))S.lw=0;if(!(S.lr>=0))S.lr=-1;
+const vt=()=>S.view==="rep"?"r":"w";
+const idxs=()=>S.ex.map((e,i)=>i).filter(i=>T(S.ex[i])===vt());
 const E=()=>S.ex[S.active];
 const save=()=>{try{localStorage.setItem("rm3",JSON.stringify(S))}catch(e){}};
 const f=v=>+(+v).toFixed(2);
 const CV=2.20462;
-
+function setActive(i){S.active=i;if(T(S.ex[i])==="r")S.lr=i;else S.lw=i}
+function pick(){
+  const l=idxs();if(!l.length)return false;
+  const k=vt()==="r"?"lr":"lw";let i=S[k];
+  if(!(i>=0&&i<S.ex.length&&T(S.ex[i])===vt()))i=l[0];
+  setActive(i);return true;
+}
 function renderTabs(){
   const box=$("ex");box.innerHTML="";
-  S.ex.forEach((e,i)=>{const b=document.createElement("button");b.textContent=e.n;if(i===S.active)b.className="a";b.onclick=()=>{S.active=i;sel=null;delArm=false;load();save()};box.appendChild(b)});
+  idxs().forEach(i=>{const b=document.createElement("button");b.textContent=S.ex[i].n;if(i===S.active&&$("c1").style.display!=="none")b.className="a";b.onclick=()=>{setActive(i);sel=null;delArm=false;load();save()};box.appendChild(b)});
   const p=document.createElement("button");p.textContent="＋";p.onclick=()=>{const a=$("addbox");a.style.display=a.style.display==="none"?"block":"none";if(a.style.display==="block")$("nn").focus()};box.appendChild(p);
 }
 function load(){
-  const e=E(),u=S.unit;
+  const has=pick();
+  ["c1","c2","c3"].forEach(id=>$(id).style.display=has?"":"none");
+  $("empty").style.display=has?"none":"block";
+  $("uk").className=S.view==="kg"?"a":"";$("ul").className=S.view==="lb"?"a":"";$("ur").className=S.view==="rep"?"a":"";
+  $("rnbox").style.display="none";$("del").textContent="종목 삭제";
+  if(!has){renderTabs();return}
+  const e=E(),u=S.unit,isR=e.t==="r";
   $("nm").textContent=e.n;
   $("rm").value=e.rm;$("w").value=e.w;$("r").value=e.r;$("cp").value=e.cp;
   document.querySelectorAll(".un").forEach(x=>x.textContent=u);
-  $("hm").textContent=u.toUpperCase();$("ho").textContent=(u==="lb"?"KG":"LB");
-  $("uk").className=u==="kg"?"a":"";$("ul").className=u==="lb"?"a":"";
-  $("rnbox").style.display="none";$("del").textContent="종목 삭제";$("del").style.display=S.ex.length>1?"":"none";
-  $("mvl").disabled=S.active===0;$("mvr").disabled=S.active===S.ex.length-1;
-  setMode(e.mode||1,true);renderTabs();calc();
+  $("rml").textContent=isR?"MAX REPS (회)":"1RM ("+u+")";
+  $("rm").placeholder=isR?"예: 20":"예: 225";
+  $("mtabs").style.display=isR?"none":"";
+  $("ol").textContent=isR?"MAX REPS":"1RM";
+  const l=idxs(),pos=l.indexOf(S.active);
+  $("mvl").disabled=pos===0;$("mvr").disabled=pos===l.length-1;
+  setMode(isR?1:(e.mode||1),true);renderTabs();calc();
 }
 function calc(){
   const e=E(),u=S.unit,o=u==="lb"?"kg":"lb",conv=u==="lb"?1/CV:CV;
   const oc=v=>f(v*conv);
+  if(e.t==="r"){
+    $("th").innerHTML='<th>%</th><th class="m">목표 횟수</th>';
+    const m=+e.rm;
+    if(!(m>0)){$("out").textContent="-";$("co").textContent="-";$("co2").textContent="";
+      $("tb").innerHTML='<tr><td colspan="2" style="text-align:center;color:var(--mut);padding:24px 0">MAX REPS를 입력하면 표가 나와요</td></tr>';return}
+    $("out").textContent=f(m)+" 회";
+    const c2=+e.cp;
+    if(c2>0){$("co").textContent=Math.round(m*c2/100)+" 회";$("co2").textContent="(반올림)"}
+    else{$("co").textContent="-";$("co2").textContent=""}
+    $("tb").innerHTML=P.map(([p])=>`<tr class="r${sel===p?" on":""}" data-p="${p}"><td>${p}%</td><td class="w">${Math.round(m*p/100)}<small>회</small></td></tr>`).join("");
+    return;
+  }
+  $("th").innerHTML=`<th>%</th><th class="m">${u.toUpperCase()}</th><th>${o.toUpperCase()}</th><th>목표 횟수</th>`;
   let rm;
   if(e.mode===2){const w=+e.w,r=+e.r;rm=(w>0&&r>0)?(r<=1?w:w*(1+r/30)):0}else rm=+e.rm;
   if(!(rm>0)){$("out").textContent="-";$("co").textContent="-";$("co2").textContent="";
@@ -150,11 +186,14 @@ function setMode(m,noCalc){
   $("t1").className=m===1?"a":"";$("t2").className=m===2?"a":"";
   if(!noCalc){calc();save()}
 }
-function setUnit(u){
-  if(u===S.unit)return;
-  const k=S.unit==="lb"?1/CV:CV,cv=v=>(+v>0)?String(f(+v*k)):v;
-  S.ex.forEach(e=>{e.rm=cv(e.rm);e.w=cv(e.w)});
-  S.unit=u;save();load();
+function setView(v){
+  if(v===S.view)return;
+  if(v!=="rep"&&v!==S.unit){
+    const k=S.unit==="lb"?1/CV:CV,cv=x=>(+x>0)?String(f(+x*k)):x;
+    S.ex.forEach(e=>{if(T(e)==="w"){e.rm=cv(e.rm);e.w=cv(e.w)}});
+    S.unit=v;
+  }
+  S.view=v;sel=null;delArm=false;$("addbox").style.display="none";save();load();
 }
 $("rm").oninput=()=>{E().rm=$("rm").value;calc();save()};
 $("w").oninput=()=>{E().w=$("w").value;calc();save()};
@@ -162,18 +201,26 @@ $("r").oninput=()=>{E().r=$("r").value;calc();save()};
 $("cp").oninput=()=>{E().cp=$("cp").value;calc();save()};
 $("tb").addEventListener("click",ev=>{const tr=ev.target.closest("tr");if(!tr||!tr.dataset.p)return;const p=+tr.dataset.p;sel=sel===p?null:p;calc()});
 $("t1").onclick=()=>setMode(1);$("t2").onclick=()=>setMode(2);
-$("uk").onclick=()=>setUnit("kg");$("ul").onclick=()=>setUnit("lb");
-function addEx(){const n=$("nn").value.trim();if(!n)return;S.ex.push(mk(n));S.active=S.ex.length-1;$("nn").value="";$("addbox").style.display="none";sel=null;load();save()}
+$("uk").onclick=()=>setView("kg");$("ul").onclick=()=>setView("lb");$("ur").onclick=()=>setView("rep");
+function addEx(){const n=$("nn").value.trim();if(!n)return;S.ex.push(mk(n,vt()));setActive(S.ex.length-1);$("nn").value="";$("addbox").style.display="none";sel=null;load();save()}
 $("nadd").onclick=addEx;$("nn").onkeydown=e=>{if(e.key==="Enter")addEx()};
 $("del").onclick=()=>{
   if(!delArm){delArm=true;$("del").textContent="정말 삭제? 한 번 더 탭";return}
-  S.ex.splice(S.active,1);S.active=Math.max(0,S.active-1);delArm=false;sel=null;load();save();
+  const i=S.active,k=vt()==="r"?"lr":"lw",ok=vt()==="r"?"lw":"lr";
+  S.ex.splice(i,1);
+  if(S[ok]>i)S[ok]--;
+  S[k]=-1;delArm=false;sel=null;load();save();
 };
+function mv(d){
+  const l=idxs(),p=l.indexOf(S.active),q=p+d;
+  if(p<0||q<0||q>=l.length)return;
+  const i=S.active,j=l[q];[S.ex[i],S.ex[j]]=[S.ex[j],S.ex[i]];
+  setActive(j);delArm=false;load();save();
+}
+$("mvl").onclick=()=>mv(-1);$("mvr").onclick=()=>mv(1);
 function doRen(){const n=$("rn").value.trim();if(!n)return;E().n=n;$("rnbox").style.display="none";load();save()}
 $("ren").onclick=()=>{const b=$("rnbox");const show=b.style.display==="none";b.style.display=show?"block":"none";if(show){$("rn").value=E().n;$("rn").focus();$("rn").select()}};
 $("rsave").onclick=doRen;$("rn").onkeydown=e=>{if(e.key==="Enter")doRen()};
-function mv(d){const i=S.active,j=i+d;if(j<0||j>=S.ex.length)return;[S.ex[i],S.ex[j]]=[S.ex[j],S.ex[i]];S.active=j;delArm=false;load();save()}
-$("mvl").onclick=()=>mv(-1);$("mvr").onclick=()=>mv(1);
 load();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>

@@ -1,6 +1,6 @@
 {
-  "name": "종목별 1RM 퍼센트표",
-  "short_name": "1RM표",
+  "name": "My MAX",
+  "short_name": "My MAX",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
